@@ -16,12 +16,26 @@
       },
       "maxLength": 61
     },
+    "masterSize": {
+      "type": "string",
+      "metadata": {
+        "description": "Number of VM instances (200 or less)."
+      },
+      "defaultValue": "Standard_B1s"
+    },
+    "vmSku": {
+      "type": "string",
+      "metadata": {
+        "description": "Number of VM instances (200 or less)."
+      },
+      "defaultValue": "Standard_B1ms"
+    },
     "instanceCount": {
       "type": "int",
       "metadata": {
         "description": "Number of VM instances (200 or less)."
       },
-      "defaultValue": 5,
+      "defaultValue": 0,
       "maxValue": 200
     },
     "adminUsername": {
@@ -45,10 +59,10 @@
     },
     "_artifactsLocationSasToken": {
       "type": "securestring",
-          "metadata": {
-              "description": "Auto-generated token to access _artifactsLocation"
-          },
-          "defaultValue": ""
+      "metadata": {
+        "description": "Auto-generated token to access _artifactsLocation"
+      },
+      "defaultValue": ""
     }
   },
   "variables": {
@@ -74,8 +88,6 @@
     "sshProbeId": "[concat(variables('loadBalancerId'),'/probes/sshProbe')]",
     "subnetName": "[concat(variables('namingInfix'), '-subnet')]",
     "vmStorageAccountContainerName": "vhds",
-    "masterSize": "Standard_DS3_v2",
-    "vmSku": "Standard_DS4_v2",
     "imageReference": {
       "publisher": "Canonical",
       "offer": "UbuntuServer",
@@ -308,7 +320,7 @@
           "id": "[resourceId('Microsoft.Compute/availabilitySets', variables('availabilitySetName'))]"
         },
         "hardwareProfile": {
-          "vmSize": "[variables('masterSize')]"
+          "vmSize": "[parameters('masterSize')]"
         },
         "osProfile": {
           "computerName": "[concat('master-vm', copyIndex())]",
@@ -368,7 +380,7 @@
         "[concat('Microsoft.Network/virtualNetworks/', variables('virtualNetworkName'))]"
       ],
       "sku": {
-        "name": "[variables('vmSku')]",
+        "name": "[parameters('vmSku')]",
         "tier": "Standard",
         "capacity": "[parameters('instanceCount')]"
       },
