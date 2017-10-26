@@ -168,6 +168,7 @@ configure_system()
     sed -i 's|#LimitMEMLOCK=infinity|LimitMEMLOCK=infinity|' /usr/lib/systemd/system/elasticsearch.service
     chown -R elasticsearch:elasticsearch /usr/share/elasticsearch
     if [ ${IS_DATA_NODE} -eq 1 ]; 
+    then
         # data disk
         DATA_DIR="/datadisks/disk1"
         if ! [ -f "vm-disk-utils-0.1.sh" ]; 
