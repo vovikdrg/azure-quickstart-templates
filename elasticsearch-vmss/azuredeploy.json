@@ -35,7 +35,7 @@
       "metadata": {
         "description": "Number of VM instances (200 or less)."
       },
-      "defaultValue": 0,
+      "defaultValue": 2,
       "maxValue": 200
     },
     "adminUsername": {
