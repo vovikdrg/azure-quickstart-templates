@@ -11,6 +11,7 @@
     },
     "vmssName": {
       "type": "string",
+      "defaultValue": "elasticsearch-cluster",
       "metadata": {
         "description": "String used as a base for naming resources. Must be 3-61 characters in length and globally unique across Azure. A hash is prepended to this string for some resources, and resource-specific information is appended."
       },
@@ -26,14 +27,14 @@
     "vmSku": {
       "type": "string",
       "metadata": {
-        "description": "Number of VM instances (200 or less)."
+        "description": "VM size."
       },
       "defaultValue": "Standard_B1ms"
     },
     "instanceCount": {
       "type": "int",
       "metadata": {
-        "description": "Number of VM instances (200 or less)."
+        "description": "Number of VM instances (100 or less)."
       },
       "defaultValue": 2,
       "maxValue": 200
@@ -42,7 +43,8 @@
       "type": "string",
       "metadata": {
         "description": "Admin username on all VMs."
-      }
+      },
+      "defaultValue": "elasticsearch"
     },
     "adminPassword": {
       "type": "securestring",
@@ -307,7 +309,7 @@
       }
     },
     {
-      "apiVersion": "2016-04-30-preview",
+      "apiVersion": "[variables('computeApiVersion')]",
       "type": "Microsoft.Compute/virtualMachines",
       "name": "[concat(variables('masterName'), copyindex())]",
       "location": "[resourceGroup().location]",
@@ -389,7 +391,6 @@
         "capacity": "[parameters('instanceCount')]"
       },
       "properties": {
-        "largeScaleEnabled": "true",
         "overprovision": "true",
         "upgradePolicy": {
           "mode": "Manual"
@@ -413,7 +414,7 @@
             ]
           },
           "osProfile": {
-            "computerNamePrefix": "[variables('namingInfix')]",
+            "computerNamePrefix": "[variables('namingInfix')]-datanode",
             "adminUsername": "[parameters('adminUsername')]",
             "adminPassword": "[parameters('adminPassword')]"
           },
