@@ -349,7 +349,7 @@
       },
       "resources": [
         {
-          "type": "extensions",
+          "type": "Microsoft.Compute/virtualMachines/extensions",
           "name": "[concat(variables('masterName'), copyindex(), '/installelasticsearch')]",
           "apiVersion": "2017-03-30",
           "location": "[resourceGroup().location]",
