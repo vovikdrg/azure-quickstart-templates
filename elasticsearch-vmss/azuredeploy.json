@@ -22,7 +22,7 @@
       "metadata": {
         "description": "Number of VM instances (200 or less)."
       },
-      "defaultValue": "Standard_B1s"
+      "defaultValue": "Standard_B1ms"
     },
     "vmSku": {
       "type": "string",

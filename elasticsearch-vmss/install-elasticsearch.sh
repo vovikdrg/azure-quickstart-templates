@@ -166,8 +166,11 @@ configure_system()
     echo 'MAX_LOCKED_MEMORY=unlimited' >> /etc/default/elasticsearch
     sed -i 's|#LimitMEMLOCK=infinity|LimitMEMLOCK=infinity|' /usr/lib/systemd/system/elasticsearch.service
     chown -R elasticsearch:elasticsearch /usr/share/elasticsearch
-    if [ ${IS_DATA_NODE} -eq 1 ]; 
+    
+    if [ ${IS_DATA_NODE} -eq 0 ]; 
     then
+        echo "Skip kibana" 
+    else
         # data disk
         DATA_DIR="/datadisks/disk1"
         if ! [ -f "vm-disk-utils-0.1.sh" ]; 
