@@ -11,7 +11,7 @@
     },
     "vmssName": {
       "type": "string",
-      "defaultValue": "elasticsearch-cluster",
+      "defaultValue": "fm-elastic-cluster",
       "metadata": {
         "description": "String used as a base for naming resources. Must be 3-61 characters in length and globally unique across Azure. A hash is prepended to this string for some resources, and resource-specific information is appended."
       },
@@ -156,10 +156,14 @@
       "name": "[concat(variables('publicIpAddressName'), copyindex())]",
       "location": "[resourceGroup().location]",
       "apiVersion": "2016-03-30",
+      "copy": {
+        "name": "publicIps",
+        "count": 3
+      },
       "properties": {
         "publicIPAllocationMethod": "Static",
         "dnsSettings": {
-          "domainNameLabel": "[variables('domainNameLabel')]"
+          "domainNameLabel": "[concat(variables('domainNameLabel'), copyindex())]"
         }
       }
     },
@@ -361,14 +365,5 @@
       }
     }
   ],
-  "outputs": {
-    "kibana-url": {
-      "type": "string",
-      "value": "[concat('http://', reference(resourceId('Microsoft.Network/publicIPAddresses', variables('publicIpAddressName'))).dnsSettings.fqdn, ':5601/app/monitoring#/elasticsearch')]"
-    },
-    "ssh-connection": {
-      "type": "string",
-      "value": "[concat('ssh ', parameters('adminUsername'), '@', reference(resourceId('Microsoft.Network/publicIPAddresses', variables('publicIpAddressName'))).dnsSettings.fqdn)]"
-    }
-  }
+  "outputs": {}
 }
