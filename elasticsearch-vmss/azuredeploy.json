@@ -76,19 +76,11 @@
     "domainNameLabel": "[variables('namingInfix')]",
     "virtualNetworkName": "[concat(variables('namingInfix'), '-vnet')]",
     "publicIpAddressName": "[concat(variables('namingInfix'), '-pip')]",
-    "publicIpAddressId": "[resourceId('Microsoft.Network/publicIPAddresses', variables('publicIpAddressName'))]",
-    "loadBalancerName": "[concat(variables('namingInfix'), '-lb')]",
-    "loadBalancerId": "[resourceId('Microsoft.Network/loadBalancers', variables('loadBalancerName'))]",
-    "backendPoolName": "[concat(variables('namingInfix'), '-bepool')]",
     "nicName": "[concat(variables('namingInfix'), '-nic')]",
     "masterName": "[concat(variables('namingInfix'), '-master')]",
     "availabilitySetName": "[concat(variables('namingInfix'), '-master-set')]",
     "nsgName": "[concat(variables('namingInfix'), '-master-nsg')]",
     "ipConfigName": "[concat(variables('namingInfix'), '-ipconfig')]",
-    "frontendIpConfigId": "[concat(variables('loadBalancerId'),'/frontendIPConfigurations/loadBalancerFrontEnd')]",
-    "loadBalancerPoolId": "[concat(variables('loadBalancerId'),'/backendAddressPools/', variables('backendPoolName'))]",
-    "loadBalancerProbeId": "[concat(variables('loadBalancerId'),'/probes/tcpProbe')]",
-    "sshProbeId": "[concat(variables('loadBalancerId'),'/probes/sshProbe')]",
     "subnetName": "[concat(variables('namingInfix'), '-subnet')]",
     "imageReference": {
       "publisher": "Canonical",
@@ -161,61 +153,14 @@
     },
     {
       "type": "Microsoft.Network/publicIPAddresses",
-      "name": "[variables('publicIpAddressName')]",
+      "name": "[concat(variables('publicIpAddressName'), copyindex())]",
       "location": "[resourceGroup().location]",
       "apiVersion": "2016-03-30",
       "properties": {
-        "publicIPAllocationMethod": "Dynamic",
+        "publicIPAllocationMethod": "Static",
         "dnsSettings": {
           "domainNameLabel": "[variables('domainNameLabel')]"
         }
-      }
-    },
-    {
-      "type": "Microsoft.Network/loadBalancers",
-      "name": "[variables('loadBalancerName')]",
-      "location": "[resourceGroup().location]",
-      "apiVersion": "2016-03-30",
-      "dependsOn": [
-        "[concat('Microsoft.Network/publicIPAddresses/', variables('publicIpAddressName'))]"
-      ],
-      "properties": {
-        "frontendIPConfigurations": [
-          {
-            "name": "LoadBalancerFrontEnd",
-            "properties": {
-              "publicIPAddress": {
-                "id": "[variables('publicIpAddressId')]"
-              }
-            }
-          }
-        ],
-        "backendAddressPools": [
-          {
-            "name": "[variables('backendPoolName')]"
-          }
-        ],
-        "loadBalancingRules": [],
-        "probes": [
-          {
-            "name": "tcpProbe",
-            "properties": {
-              "protocol": "Tcp",
-              "port": 9200,
-              "intervalInSeconds": 30,
-              "numberOfProbes": 2
-            }
-          },
-          {
-            "name": "sshProbe",
-            "properties": {
-              "protocol": "Tcp",
-              "port": 22,
-              "intervalInSeconds": 30,
-              "numberOfProbes": 2
-            }
-          }
-        ]
       }
     },
     {
@@ -235,7 +180,7 @@
       "name": "[concat(variables('nicName'), copyindex())]",
       "location": "[resourceGroup().location]",
       "dependsOn": [
-        "[resourceId('Microsoft.Network/publicIPAddresses', variables('publicIpAddressName'))]",
+        "[resourceId('Microsoft.Network/publicIPAddresses', concat(variables('publicIpAddressName'), copyindex()))]",
         "[resourceId('Microsoft.Network/networkSecurityGroups', variables('nsgName'))]"
       ],
       "copy": {
@@ -252,11 +197,9 @@
               "subnet": {
                 "id": "[concat(resourceId('Microsoft.Network/virtualNetworks/', variables('virtualNetworkName')), '/subnets/', variables('subnetName'))]"
               },
-              "loadBalancerBackendAddressPools": [
-                {
-                  "id": "[concat(resourceId('Microsoft.Network/loadBalancers', variables('loadBalancerName')), '/backendAddressPools/', variables('backendPoolName'))]"
-                }
-              ],
+              "publicIPAddress": {
+                "id": "[resourceId('Microsoft.Network/publicIPAddresses', concat(variables('publicIPAddressName'), copyindex()))]"
+              },
               "networkSecurityGroup": {
                 "id": "[resourceId('Microsoft.Network/networkSecurityGroups', variables('nsgName'))]"
               }
