@@ -126,11 +126,11 @@
             "properties": {
               "description": "Allows inbound HTTP traffic from anyone",
               "protocol": "Tcp",
-              "sourcePortRange": "5601",
-              "destinationPortRange": "5601",
+              "sourcePortRange": "9200",
+              "destinationPortRange": "9200",
               "sourceAddressPrefix": "*",
               "destinationAddressPrefix": "*",
-              "access": "Allow",
+              "access": "Deny",
               "priority": 200,
               "direction": "Inbound"
             }
@@ -195,46 +195,7 @@
             "name": "[variables('backendPoolName')]"
           }
         ],
-        "loadBalancingRules": [
-          {
-            "name": "LBRule",
-            "properties": {
-              "frontendIPConfiguration": {
-                "id": "[variables('frontendIpConfigId')]"
-              },
-              "backendAddressPool": {
-                "id": "[variables('loadBalancerPoolId')]"
-              },
-              "protocol": "Tcp",
-              "frontendPort": 5601,
-              "backendPort": 5601,
-              "enableFloatingIP": false,
-              "idleTimeoutInMinutes": 5,
-              "probe": {
-                "id": "[variables('loadBalancerProbeId')]"
-              }
-            }
-          },
-          {
-            "name": "ssh",
-            "properties": {
-              "frontendIPConfiguration": {
-                "id": "[variables('frontendIpConfigId')]"
-              },
-              "backendAddressPool": {
-                "id": "[variables('loadBalancerPoolId')]"
-              },
-              "protocol": "Tcp",
-              "frontendPort": 22,
-              "backendPort": 22,
-              "enableFloatingIP": false,
-              "idleTimeoutInMinutes": 5,
-              "probe": {
-                "id": "[variables('sshProbeId')]"
-              }
-            }
-          }
-        ],
+        "loadBalancingRules": [],
         "probes": [
           {
             "name": "tcpProbe",
