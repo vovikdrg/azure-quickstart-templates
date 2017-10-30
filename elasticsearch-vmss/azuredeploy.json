@@ -80,6 +80,8 @@
     "nsgName": "[concat(variables('namingInfix'), '-master-nsg')]",
     "ipConfigName": "[concat(variables('namingInfix'), '-ipconfig')]",
     "subnetName": "[concat(variables('namingInfix'), '-subnet')]",
+    "publicIpAddressName": "[concat(variables('namingInfix'), '-pip')]",
+    "domainNameLabel": "[variables('namingInfix')]",
     "imageReference": {
       "publisher": "Canonical",
       "offer": "UbuntuServer",
@@ -90,6 +92,18 @@
     "diskSetupScriptUrl": "[concat(parameters('_artifactsLocation'), '/shared_scripts/ubuntu/vm-disk-utils-0.1.sh', parameters('_artifactsLocationSasToken'))]"
   },
   "resources": [
+    {
+      "type": "Microsoft.Network/publicIPAddresses",
+      "name": "[variables('publicIpAddressName')]",
+      "location": "[resourceGroup().location]",
+      "apiVersion": "2016-03-30",
+      "properties": {
+        "publicIPAllocationMethod": "Dynamic",
+        "dnsSettings": {
+          "domainNameLabel": "[variables('domainNameLabel')]"
+        }
+      }
+    },
     {
       "apiVersion": "2016-03-30",
       "type": "Microsoft.Network/networkSecurityGroups",
@@ -166,7 +180,9 @@
       "name": "[concat(variables('nicName'), copyindex())]",
       "location": "[resourceGroup().location]",
       "dependsOn": [
-        "[resourceId('Microsoft.Network/networkSecurityGroups', variables('nsgName'))]"
+        "[resourceId('Microsoft.Network/networkSecurityGroups', variables('nsgName'))]",
+        "[concat('Microsoft.Network/publicIpAddresses/', variables('publicIpAddressName'))]",
+        "[concat('Microsoft.Network/networkSecurityGroups/', variables('nsgName'))]"
       ],
       "copy": {
         "name": "masterNodesNicLoop",
@@ -177,6 +193,9 @@
           {
             "name": "ipconfigmaster",
             "properties": {
+              "publicIpAddress": {
+                "id": "[resourceId('Microsoft.Network/publicIpAddresses', variables('publicIpAddressName'))]"
+              },
               "privateIPAllocationMethod": "Static",
               "privateIPAddress": "[concat('10.0.0.1', copyindex())]",
               "subnet": {
@@ -343,6 +362,5 @@
       }
     }
   ],
-  "outputs": {
-  }
+  "outputs": {}
 }
