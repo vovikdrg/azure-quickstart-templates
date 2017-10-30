@@ -100,31 +100,16 @@
       "properties": {
         "securityRules": [
           {
-            "name": "ssh",
+            "name": "default-allow-ssh",
             "properties": {
-              "description": "Allows inbound ssh traffic",
+              "priority": 1000,
               "protocol": "Tcp",
-              "sourcePortRange": "22",
-              "destinationPortRange": "22",
-              "sourceAddressPrefix": "*",
-              "destinationAddressPrefix": "*",
               "access": "Allow",
-              "priority": 100,
-              "direction": "Inbound"
-            }
-          },
-          {
-            "name": "Elasticsearch",
-            "properties": {
-              "description": "Allows inbound HTTP traffic from anyone",
-              "protocol": "Tcp",
-              "sourcePortRange": "9200",
-              "destinationPortRange": "9200",
+              "direction": "Inbound",
               "sourceAddressPrefix": "*",
+              "sourcePortRange": "*",
               "destinationAddressPrefix": "*",
-              "access": "Deny",
-              "priority": 200,
-              "direction": "Inbound"
+              "destinationPortRange": "22"
             }
           }
         ]
@@ -184,6 +169,7 @@
       "name": "[concat(variables('nicName'), copyindex())]",
       "location": "[resourceGroup().location]",
       "dependsOn": [
+        "[concat('Microsoft.Network/virtualNetworks/', variables('virtualNetworkName'))]",
         "[resourceId('Microsoft.Network/publicIPAddresses', concat(variables('publicIpAddressName'), copyindex()))]",
         "[resourceId('Microsoft.Network/networkSecurityGroups', variables('nsgName'))]"
       ],
@@ -203,13 +189,13 @@
               },
               "publicIPAddress": {
                 "id": "[resourceId('Microsoft.Network/publicIPAddresses', concat(variables('publicIPAddressName'), copyindex()))]"
-              },
-              "networkSecurityGroup": {
-                "id": "[resourceId('Microsoft.Network/networkSecurityGroups', variables('nsgName'))]"
               }
             }
           }
-        ]
+        ],
+        "networkSecurityGroup": {
+          "id": "[resourceId('Microsoft.Network/networkSecurityGroups', variables('nsgName'))]"
+        }
       }
     },
     {
@@ -309,7 +295,7 @@
               {
                 "lun": 0,
                 "createOption": "Empty",
-                "diskSizeGB": 30,
+                "diskSizeGB": 32,
                 "caching": "ReadWrite",
                 "managedDisk": {
                   "storageAccountType": "[variables('storageAccountType')]"
